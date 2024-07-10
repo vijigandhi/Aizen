@@ -1,329 +1,199 @@
-
-
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import axios from 'axios';
-import '../index.css';
 
+const RegisterForm = () => {
+  const initialFormData = {
+    first_name: '',
+    last_name: '',
+    email: '',
+    password: '',
+    id_proof: null,
+  };
 
-const RegistrationForm = () => {
-   const [formData, setFormData] = useState({
-       first_name: '',
-       last_name: '',
-       email: '',
-       password: '',
-       address_line1: '',
-       address_line2: '',
-       address_line3: '',
-       city: '',
-       state: '',
-       pincode: '',
-       country: '',
-       telephone: '',
-       id_proof: '', // Added id_proof field for file upload
-   });
+  const [formData, setFormData] = useState(initialFormData);
+  const [errors, setErrors] = useState({});
+  const [showIdProofInput, setShowIdProofInput] = useState(false);
+  const navigate = useNavigate();
 
+  const handleChange = (e) => {
+    if (e.target.name === 'id_proof') {
+      setFormData({ ...formData, id_proof: e.target.files[0] });
+    } else {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    }
+  };
 
-   const [errors, setErrors] = useState({});
-   const [submissionMessage, setSubmissionMessage] = useState('');
-   const [addImage, setAddImage] = useState(false); // State for image upload checkbox
-   const [selectedFile, setSelectedFile] = useState(null); // State for selected file
+  const handleCheckboxChange = (e) => {
+    setShowIdProofInput(e.target.checked);
+    if (!e.target.checked) {
+      setFormData({ ...formData, id_proof: null });
+    }
+  };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-   // Validate form fields
-   const validateForm = (data) => {
-       let errors = {};
+    const validationErrors = {};
+    if (!formData.first_name.trim()) {
+      validationErrors.first_name = 'First Name is required';
+    }
+    if (!formData.last_name.trim()) {
+      validationErrors.last_name = 'Last Name is required';
+    }
+    if (!formData.email.trim()) {
+      validationErrors.email = 'Email is required';
+    }
+    if (!formData.password.trim()) {
+      validationErrors.password = 'Password is required';
+    }
+    if (showIdProofInput && !formData.id_proof) {
+      validationErrors.id_proof = 'Please upload an ID proof';
+    }
 
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      setTimeout(() => {
+        setErrors({});
+      }, 5000); // Timeout set to 5 seconds
+      return;
+    }
 
-       if (!data.first_name.trim()) {
-           errors.first_name = 'First name is required';
-       }
-       if (!data.last_name.trim()) {
-           errors.last_name = 'Last name is required';
-       }
-       if (!data.email.trim()) {
-           errors.email = 'Email is required';
-       } else if (!/\S+@\S+\.\S+/.test(data.email)) {
-           errors.email = 'Email address is invalid';
-       }
-       if (!data.password.trim()) {
-           errors.password = 'Password is required';
-       } else if (data.password.length <= 8) {
-           errors.password = 'Password must be longer than 8 characters';
-       }
-       if (!data.address_line1.trim()) {
-           errors.address_line1 = 'Address Line 1 is required';
-       }
-       if (!data.city.trim()) {
-           errors.city = 'City is required';
-       }
-       if (!data.state.trim()) {
-           errors.state = 'State is required';
-       }
-       if (!data.pincode.trim()) {
-           errors.pincode = 'Pincode is required';
-       } else if (!/^\d{6}$/.test(data.pincode)) {
-           errors.pincode = 'Pincode must be a 6-digit number';
-       }
-       if (!data.country.trim()) {
-           errors.country = 'Country is required';
-       }
-       if (!data.telephone.trim()) {
-           errors.telephone = 'Telephone is required';
-       }
+    try {
+      const formDataForApi = new FormData();
+      formDataForApi.append('first_name', formData.first_name);
+      formDataForApi.append('last_name', formData.last_name);
+      formDataForApi.append('email', formData.email);
+      formDataForApi.append('password', formData.password);
+      if (showIdProofInput && formData.id_proof) {
+        formDataForApi.append('id_proof', formData.id_proof);
+      }
 
+      const response = await axios.post('http://localhost/AIZEN/Backend/Registerapi.php', formDataForApi);
+      console.log('Registration successful:', response.data);
 
-       return errors;
-   };
+      // Reset form fields, errors, and additional states after successful registration
+      setFormData({
+        first_name: '',
+        last_name: '',
+        email: '',
+        password: '',
+      });
+      setErrors({});
+      setShowIdProofInput(false);
+      
+      // Show alert for successful registration
+      alert('Registration successful');
+      navigate('/login');
 
+    } catch (error) {
+      console.error('Registration failed:', error);
+      // Handle error display
+    }
+  };
 
-   // Handle form input changes
-   const handleChange = (e) => {
-       const { name, value } = e.target;
-       setFormData({ ...formData, [name]: value });
-   };
-
-
-   // Handle checkbox state change
-   const handleCheckboxChange = () => {
-       setAddImage(!addImage); // Toggle checkbox state
-   };
-
-
-   // Handle file selection
-   const handleFileChange = (e) => {
-       setSelectedFile(e.target.files[0]); // Set selected file
-   };
-
-
-   // Handle form submission
-   const handleSubmit = async (e) => {
-       e.preventDefault();
-       const validationErrors = validateForm(formData);
-
-
-       if (Object.keys(validationErrors).length === 0) {
-           try {
-               let postData = { ...formData };
-
-
-               if (addImage && selectedFile) {
-                   // Prepare form data with file
-                   const formDataWithFile = new FormData();
-                   formDataWithFile.append('first_name', formData.first_name);
-                   formDataWithFile.append('last_name', formData.last_name);
-                   formDataWithFile.append('email', formData.email);
-                   formDataWithFile.append('password', formData.password);
-                   formDataWithFile.append('address_line1', formData.address_line1);
-                   formDataWithFile.append('address_line2', formData.address_line2);
-                   formDataWithFile.append('address_line3', formData.address_line3);
-                   formDataWithFile.append('city', formData.city);
-                   formDataWithFile.append('state', formData.state);
-                   formDataWithFile.append('pincode', formData.pincode);
-                   formDataWithFile.append('country', formData.country);
-                   formDataWithFile.append('telephone', formData.telephone);
-                   formDataWithFile.append('id_proof', selectedFile); // Append file
-
-
-                   // Send POST request with FormData for file upload
-                   const response = await axios.post('http://localhost/AIZEN/Backend/Registerapi.php', formDataWithFile);
-                   setSubmissionMessage(response.data.message);
-               } else {
-                   // Send POST request without file
-                   const response = await axios.post('http://localhost/AIZEN/Backend/Registerapi.php', postData);
-                   setSubmissionMessage(response.data.message);
-               }
-
-
-               // Reset form and state after submission
-               setFormData({
-                   first_name: '',
-                   last_name: '',
-                   email: '',
-                   password: '',
-                   address_line1: '',
-                   address_line2: '',
-                   address_line3: '',
-                   city: '',
-                   state: '',
-                   pincode: '',
-                   country: '',
-                   telephone: '',
-                   id_proof: '', // Reset id_proof field
-               });
-               setErrors({});
-               setAddImage(false);
-               setSelectedFile(null);
-           } catch (error) {
-               console.error('Registration error:', error);
-               setSubmissionMessage('An error occurred during registration.');
-           }
-       } else {
-           setErrors(validationErrors);
-           setTimeout(() => {
-               setErrors({});
-           }, 1000);
-       }
-   };
-
-
-   return (
-       <form onSubmit={handleSubmit}>
-           <h2>Registration Form</h2>
-           <div className="section">
-               <h3>Personal Details</h3>
-               <div className="form-group">
-                   <label>First Name:</label>
-                   <input
-                       type="text"
-                       name="first_name"
-                       value={formData.first_name}
-                       onChange={handleChange}
-                   />
-                   {errors.first_name && <p className="error">{errors.first_name}</p>}
-               </div>
-               <div className="form-group">
-                   <label>Last Name:</label>
-                   <input
-                       type="text"
-                       name="last_name"
-                       value={formData.last_name}
-                       onChange={handleChange}
-                   />
-                   {errors.last_name && <p className="error">{errors.last_name}</p>}
-               </div>
-               <div className="form-group">
-                   <label>Email:</label>
-                   <input
-                       type="email"
-                       name="email"
-                       value={formData.email}
-                       onChange={handleChange}
-                   />
-                   {errors.email && <p className="error">{errors.email}</p>}
-               </div>
-               <div className="form-group">
-                   <label>Password:</label>
-                   <input
-                       type="password"
-                       name="password"
-                       value={formData.password}
-                       onChange={handleChange}
-                   />
-                   {errors.password && <p className="error">{errors.password}</p>}
-               </div>
-           </div>
-
-
-           <div className="section">
-               <h3>Contact Information</h3>
-               <div className="form-group">
-                   <label>Address Line 1:</label>
-                   <input
-                       type="text"
-                       name="address_line1"
-                       value={formData.address_line1}
-                       onChange={handleChange}
-                   />
-                   {errors.address_line1 && <p className="error">{errors.address_line1}</p>}
-               </div>
-               <div className="form-group">
-                   <label>Address Line 2:</label>
-                   <input
-                       type="text"
-                       name="address_line2"
-                       value={formData.address_line2}
-                       onChange={handleChange}
-                   />
-               </div>
-               <div className="form-group">
-                   <label>Address Line 3:</label>
-                   <input
-                       type="text"
-                       name="address_line3"
-                       value={formData.address_line3}
-                       onChange={handleChange}
-                   />
-               </div>
-               <div className="form-group">
-                   <label>City:</label>
-                   <input
-                       type="text"
-                       name="city"
-                       value={formData.city}
-                       onChange={handleChange}
-                   />
-                   {errors.city && <p className="error">{errors.city}</p>}
-               </div>
-               <div className="form-group">
-                   <label>State:</label>
-                   <input
-                       type="text"
-                       name="state"
-                       value={formData.state}
-                       onChange={handleChange}
-                   />
-                   {errors.state && <p className="error">{errors.state}</p>}
-               </div>
-               <div className="form-group">
-                   <label>Pincode:</label>
-                   <input
-                       type="text"
-                       name="pincode"
-                       value={formData.pincode}
-                       onChange={handleChange}
-                   />
-                   {errors.pincode && <p className="error">{errors.pincode}</p>}
-               </div>
-               <div className="form-group">
-                   <label>Country:</label>
-                   <input
-                       type="text"
-                       name="country"
-                       value={formData.country}
-                       onChange={handleChange}
-                   />
-                   {errors.country && <p className="error">{errors.country}</p>}
-               </div>
-               <div className="form-group">
-                   <label>Telephone:</label>
-                   <input
-                       type="text"
-                       name="telephone"
-                       value={formData.telephone}
-                       onChange={handleChange}
-                   />
-                   {errors.telephone && <p className="error">{errors.telephone}</p>}
-               </div>
-           </div>
-
-
-           <div className="section">
-               <h3>Upload ID Proof</h3>
-               <div className="form-group">
-                   <label>
-                       <input
-                           type="checkbox"
-                           checked={addImage}
-                           onChange={handleCheckboxChange}
-                       />
-                       Upload ID Proof Image
-                   </label>
-                   {addImage && (
-                       <input
-                           type="file"
-                           name="id_proof" // Use name="id_proof" for file input
-                           onChange={handleFileChange}
-                       />
-                   )}
-               </div>
-           </div>
-
-
-           <button type="submit">Register</button>
-           {submissionMessage && <p>{submissionMessage}</p>}
-           <p>Already have an account? Login</p>
-       </form>
-   );
+  return (
+    <div className="mx-auto max-w-screen-md bg-white p-8 mt-10 rounded-md shadow-md">
+      <h2 className="text-2xl font-bold mb-6">Registration Form</h2>
+      <form onSubmit={handleSubmit}>
+        <div className="mb-4">
+          <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">
+            First Name
+          </label>
+          <input
+            type="text"
+            id="first_name"
+            name="first_name"
+            value={formData.first_name}
+            onChange={handleChange}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm px-3 py-2"
+          />
+          {errors.first_name && <p className="text-red-500 text-sm mt-1">{errors.first_name}</p>}
+        </div>
+        <div className="mb-4">
+          <label htmlFor="last_name" className="block text-sm font-medium text-gray-700">
+            Last Name
+          </label>
+          <input
+            type="text"
+            id="last_name"
+            name="last_name"
+            value={formData.last_name}
+            onChange={handleChange}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm px-3 py-2"
+          />
+          {errors.last_name && <p className="text-red-500 text-sm mt-1">{errors.last_name}</p>}
+        </div>
+        <div className="mb-4">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            Email
+          </label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm px-3 py-2"
+          />
+          {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+        </div>
+        <div className="mb-4">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            Password
+          </label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm px-3 py-2"
+          />
+          {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+        </div>
+        <div className="mb-4">
+          <div className="flex items-center">
+            <input
+              type="checkbox"
+              id="show_id_proof"
+              name="show_id_proof"
+              checked={showIdProofInput}
+              onChange={handleCheckboxChange}
+              className="mr-2"
+            />
+            <label htmlFor="show_id_proof" className="text-sm font-medium text-gray-700">
+              Provide ID Proof
+            </label>
+          </div>
+          {showIdProofInput && (
+            <div className="mt-2">
+              <label htmlFor="id_proof" className="block text-sm font-medium text-gray-700 mb-2">
+                ID Proof (Upload Image)
+              </label>
+              <input
+                type="file"
+                id="id_proof"
+                name="id_proof"
+                onChange={handleChange}
+                accept="image/*" // Specify accepted file types
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm px-3 py-2"
+              />
+              {errors.id_proof && <p className="text-red-500 text-sm mt-1">{errors.id_proof}</p>}
+            </div>
+          )}
+        </div>
+        <div className="flex items-center justify-between mt-6">
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+          >
+            Register
+          </button>
+        </div>
+      </form>
+    </div>
+  );
 };
 
-export default RegistrationForm
+export default RegisterForm;

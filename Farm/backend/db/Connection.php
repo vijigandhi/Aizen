@@ -1,16 +1,19 @@
 <?php
+class DbConnect {
+    private $host = "localhost";
+    private $db = "AIZEN";
+    private $user = "dckap";
+    private $password = "Dckap2023Ecommerce";
 
-$host = "localhost";
-$db = "AIZEN";
-$user = "dckap";
-$password = "Dckap2023Ecommerce";
-$charset = "utf8mb4";
-
-$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-
-try{
-    $pdo = new PDO($dsn,$user,$password);
+    public function connect() {
+        try {
+            $conn = new PDO('mysql:host=' . $this->host . ';dbname=' . $this->db, $this->user, $this->password);
+            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            echo "Connection failed: " . $e->getMessage();
+            return null;
+        }
+        return $conn;
+    }
 }
-catch(\PDOException){
-    throw new \PDOException($e->getMessage(),(int)$e->getCode());
-}
+

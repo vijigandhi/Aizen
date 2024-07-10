@@ -1,14 +1,15 @@
 
 import React from 'react';
-import RegistrationForm from './Components/Register';  
-import { BrowserRouter,Routes,Route } from 'react-router-dom';
-import './index.css'; 
-function App() {
-    return (
-        <div className="App">
-            <RegistrationForm />
-        </div>
-    );
-}
+import AppRouter from './Components/Router';
+import './index.css'; // Ensure your global styles are imported correctly
+
+const App = () => {
+  return (
+    <div className="App">
+      <AppRouter/>
+    </div>
+  );
+};
 
 export default App;
+
