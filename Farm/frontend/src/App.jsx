@@ -1,15 +1,18 @@
-
 import React from 'react';
-import AppRouter from './Components/Router';
-import './index.css'; // Ensure your global styles are imported correctly
+import Header from './Components/Header';
+import Footer from './Components/Footer';
+import ProductList from './Components/ProductList';
 
-const App = () => {
+function App() {
   return (
-    <div className="App">
-      <AppRouter/>
-    </div>
+    <>
+      <Header />
+      <main>
+        <ProductList />
+      </main>
+      <Footer />
+    </>
   );
-};
+}
 
 export default App;
-
