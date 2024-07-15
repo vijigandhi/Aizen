@@ -9,7 +9,7 @@ const Header2 = () => {
   const toggleAccount = () => setAccountOpen(!accountOpen);
 
   return (
-    <nav className="bg-white text-gray-900 p-4 border-b-2">
+    <nav className="sticky top-0 z-1  bg-white text-gray-900 p-4 border-b-2">
       <div className="container mx-auto flex items-center justify-between">
         <div className="flex items-center space-x-10">
           <img src="../../src/assets/logo-crop.png" alt="Logo" className=" -m-5 w-30 h-10" />
@@ -64,7 +64,7 @@ const Header2 = () => {
           </div>
         </div>
       </div>
-      <div className="flex space-x-10 mt-4">
+      {/* <div className="flex space-x-10 mt-4">
         <div className="nav-bottom flex space-x-4 mt-4">
           <a href="#" className="hover:underline">Home</a>
           <a href="#" className="hover:underline">Vegetables</a>
@@ -72,7 +72,7 @@ const Header2 = () => {
           <a href="#" className="hover:underline">Dairy Products</a>
         </div>
        
-      </div>
+      </div> */}
     </nav>
   );
 };
