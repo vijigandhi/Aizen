@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BrowserRouter,Routes,Route } from 'react-router-dom';
 import './index.css'; 
@@ -13,7 +12,20 @@ function App() {
             <RouterComponent />
         </div>
     );
+// import Header from './Components/Header';
+// import Footer from './Components/Footer';
+// import ProductList from './Components/ProductList';
+
+// function App() {
+//   return (
+//     <>
+//       <Header />
+//       <main>
+//         <ProductList />
+//       </main>
+//       <Footer />
+//     </>
+//   );
 }
 
 export default App;
-
