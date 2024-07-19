@@ -7,6 +7,7 @@ import Adminview from './Components/Admin/Adminview.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Adminview />
+    <App />
+    {/* <Adminview /> */}
   </React.StrictMode>,
 )

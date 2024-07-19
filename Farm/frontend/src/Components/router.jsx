@@ -1,19 +1,18 @@
-// Router.js
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+// RouterComponent.jsx
 import React from 'react';
-import RegisterForm from './Register';
-import LoginForm from './Loginform';
+import { Routes, Route } from 'react-router-dom';
+// import RegisterForm from './Register';
+// import LoginForm from './Loginform';
+import ProductDetailPage from './ProductDetails'; // Import the ProductDetailPage component
 
 const RouterComponent = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/register" element={<RegisterForm />} />
-        <Route path="/login" element={<LoginForm />} />
-      </Routes>
-    </Router>
+    <Routes>
+      {/* <Route path="/register" element={<RegisterForm />} /> */}
+      {/* <Route path="/login" element={<LoginForm />} /> */}
+      <Route path="/product/:id" element={<ProductDetailPage />} /> {/* Add the route for product details */}
+    </Routes>
   );
 };
-
 
 export default RouterComponent;
