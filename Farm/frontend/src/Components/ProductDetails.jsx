@@ -29,7 +29,16 @@ const ProductDetails = () => {
   };
 
   return (
-    <div className="bg-gray-100">
+    <div className="bg-gray-100 relative">
+      {/* Close Button */}
+      <button
+        onClick={handleClose}
+        className="absolute top-4 right-4 text-gray-600 hover:text-gray-900 focus:outline-none"
+      >
+        <span className="sr-only">Close</span>
+        &times;
+      </button>
+
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-wrap -mx-4">
           {/* Product Images */}
