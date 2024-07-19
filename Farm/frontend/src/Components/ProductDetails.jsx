@@ -9,7 +9,7 @@ const ProductDetails = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   if (!product) {
-    return <div>Product not found</div>;
+    return <div className="text-center text-red-500">Product not found</div>;
   }
 
   const handleNextImage = () => {
@@ -29,10 +29,10 @@ const ProductDetails = () => {
   };
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-6">
-        <div className="flex justify-end">
-          <button onClick={handleClose} className="text-gray-600">
+    <div className="container mx-auto py-8 px-4">
+      <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-5xl mx-auto relative">
+        <div className="absolute top-4 right-4">
+          <button onClick={handleClose} className="text-gray-600 hover:text-gray-800">
             <svg
               className="w-6 h-6"
               fill="none"
@@ -44,27 +44,33 @@ const ProductDetails = () => {
             </svg>
           </button>
         </div>
-        <div className="flex mt-4">
-          <div className="w-1/2 pr-8">
+        <div className="flex flex-col md:flex-row">
+          <div className="relative md:flex-1 pr-0 md:pr-8 mb-4 md:mb-0">
             <img
               src={product.images[currentImageIndex]}
               alt={product.name}
-              className="w-full rounded-lg shadow-md"
+              className="w-full h-auto rounded-lg shadow-md"
             />
-            <div className="flex justify-between mt-2">
-              <button onClick={handlePreviousImage} className="bg-gray-200 text-gray-800 px-4 py-2 rounded">
-                Previous
-              </button>
-              <button onClick={handleNextImage} className="bg-gray-200 text-gray-800 px-4 py-2 rounded">
-                Next
-              </button>
-            </div>
+            <button
+               onClick={handlePreviousImage}
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-gray-200 text-gray-800 px-4 py-2 rounded-full hover:bg-gray-300"
+              aria-label="Previous Image"
+            >
+              &lt;
+            </button>
+            <button
+              onClick={handleNextImage}
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-gray-200 text-gray-800 px-4 py-2 rounded-full hover:bg-gray-300"
+              aria-label="Next Image"
+            >
+              &gt;
+            </button>
           </div>
-          <div className="w-1/2 pl-8">
-            <h2 className="text-2xl font-semibold mb-2">{product.name}</h2>
-            <p className="text-lg text-gray-800 mb-4">${product.price.toFixed(2)}</p>
-            <p className="text-gray-700 mb-4">{product.description}</p>
-            <button className="bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded">
+          <div className="md:flex-1 pl-0 md:pl-8">
+            <h2 className="text-3xl font-semibold mb-4">{product.name}</h2>
+            <p className="text-2xl text-gray-800 mb-4">${product.price.toFixed(2)}</p>
+            <p className="text-lg text-gray-700 mb-6">{product.description}</p>
+            <button className="bg-blue-500 hover:bg-blue-600 text-white text-lg py-2 px-6 rounded">
               Add to Cart
             </button>
           </div>
